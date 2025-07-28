@@ -1,3 +1,5 @@
+const Building = require('../entities/Building');
+
 class ElevatorDispatcher {
   constructor(elevatorRepo, callRepo, destRepo) {
     this.elevatorRepo = elevatorRepo;
@@ -15,22 +17,19 @@ class ElevatorDispatcher {
 
   async handleTick(timeProvider) {
     const elevators = await this.elevatorRepo.findAll();
+    const building = new Building(elevators);
     const calls = await this.callRepo.dequeueAll();
     const destinations = await this.destRepo.dequeueAll();
 
-    if (elevators.length > 0) {
-      const primary = elevators[0];
-
-      for (const call of calls) {
-        primary.addDestination(call.floor);
-      }
-
-      for (const dest of destinations) {
-        primary.addDestination(dest.floor);
-      }
+    for (const call of calls) {
+      building.handleCall(call);
     }
 
-    for (const elevator of elevators) {
+    for (const dest of destinations) {
+      building.handleDestination(dest);
+    }
+
+    for (const elevator of building.getElevators()) {
       elevator.move();
       await this.elevatorRepo.save(elevator);
     }
