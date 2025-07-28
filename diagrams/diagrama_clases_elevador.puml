@@ -1,0 +1,53 @@
+@startuml
+' Paquetes opcionales para organizar el modelo
+package "domain.valueobject" {
+  class FloorNumber <<ValueObject>> {
+    - value : int
+  }
+  class Direction <<ValueObject>> {
+    - value : enum {Up, Down}
+  }
+  class ElevatorState <<ValueObject>> {
+    - value : enum {Idle, MovingUp, MovingDown, Loading}
+  }
+}
+
+package "domain.entity" {
+  class Elevator <<Entity>> {
+    - id : String
+    - currentFloor : FloorNumber
+    - targetFloors : List<FloorNumber>
+    - state : ElevatorState
+    + move() : void
+    + addDestination(floor : FloorNumber) : void
+  }
+
+  class CallRequest <<Entity>> {
+    - floor : FloorNumber
+    - direction : Direction
+  }
+
+  class DestinationRequest <<Entity>> {
+    - floor : FloorNumber
+  }
+}
+
+package "domain.service" {
+  class ElevatorDispatcher <<DomainService>> {
+    + dispatch(call : CallRequest) : void
+    + dispatch(dest : DestinationRequest) : void
+    + handleTick() : void
+  }
+}
+
+' Relaciones entre clases
+FloorNumber <|-- CallRequest : uses
+Direction <|-- CallRequest : uses
+FloorNumber <|-- DestinationRequest : uses
+FloorNumber <|-- Elevator : uses
+ElevatorState <|-- Elevator : uses
+
+ElevatorDispatcher --> Elevator : manages
+ElevatorDispatcher --> CallRequest : processes
+ElevatorDispatcher --> DestinationRequest : processes
+@enduml
