@@ -2,16 +2,24 @@
 const ElevatorRepository = require('../application/ports/ElevatorRepository');
 
 class ElevatorRepositoryHttp extends ElevatorRepository {
+  constructor(initialElevators = []) {
+    super();
+    this.elevators = new Map();
+    for (const e of initialElevators) {
+      this.elevators.set(e.id, e);
+    }
+  }
+
   async findAll() {
-    throw new Error('Not implemented');
+    return Array.from(this.elevators.values());
   }
 
   async findById(id) {
-    throw new Error('Not implemented');
+    return this.elevators.get(id);
   }
 
   async save(elevator) {
-    throw new Error('Not implemented');
+    this.elevators.set(elevator.id, elevator);
   }
 }
 

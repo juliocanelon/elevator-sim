@@ -7,8 +7,13 @@ describe('TimeProviderSystem', () => {
     expect(tp instanceof TimeProvider).toBe(true);
   });
 
-  test('now throws Not implemented', () => {
+  test('now returns current timestamp', () => {
     const tp = new TimeProviderSystem();
-    expect(() => tp.now()).toThrow('Not implemented');
+    const before = Date.now();
+    const value = tp.now();
+    const after = Date.now();
+    expect(typeof value).toBe('number');
+    expect(value).toBeGreaterThanOrEqual(before);
+    expect(value).toBeLessThanOrEqual(after);
   });
 });
