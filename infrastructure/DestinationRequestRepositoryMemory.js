@@ -2,12 +2,19 @@
 const DestinationRequestRepository = require('../application/ports/DestinationRequestRepository');
 
 class DestinationRequestRepositoryMemory extends DestinationRequestRepository {
+  constructor() {
+    super();
+    this.queue = [];
+  }
+
   async enqueue(request) {
-    throw new Error('Not implemented');
+    this.queue.push(request);
   }
 
   async dequeueAll() {
-    throw new Error('Not implemented');
+    const all = [...this.queue];
+    this.queue = [];
+    return all;
   }
 }
 

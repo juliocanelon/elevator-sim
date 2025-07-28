@@ -7,8 +7,12 @@ describe('EventPublisherConsole', () => {
     expect(pub instanceof EventPublisher).toBe(true);
   });
 
-  test('publish throws Not implemented', async () => {
+  test('publish logs the event', async () => {
     const pub = new EventPublisherConsole();
-    await expect(pub.publish({})).rejects.toThrow('Not implemented');
+    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const event = { type: 'TEST' };
+    await pub.publish(event);
+    expect(spy).toHaveBeenCalledWith(event);
+    spy.mockRestore();
   });
 });

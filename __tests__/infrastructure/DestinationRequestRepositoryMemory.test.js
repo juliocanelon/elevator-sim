@@ -7,9 +7,15 @@ describe('DestinationRequestRepositoryMemory', () => {
     expect(repo instanceof DestinationRequestRepository).toBe(true);
   });
 
-  test('methods throw Not implemented', async () => {
+  test('enqueue and dequeueAll store and clear requests', async () => {
     const repo = new DestinationRequestRepositoryMemory();
-    await expect(repo.enqueue({})).rejects.toThrow('Not implemented');
-    await expect(repo.dequeueAll()).rejects.toThrow('Not implemented');
+    const req1 = { id: 1 };
+    const req2 = { id: 2 };
+    await repo.enqueue(req1);
+    await repo.enqueue(req2);
+    const all = await repo.dequeueAll();
+    expect(all).toEqual([req1, req2]);
+    const empty = await repo.dequeueAll();
+    expect(empty).toEqual([]);
   });
 });

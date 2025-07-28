@@ -7,10 +7,15 @@ describe('ElevatorRepositoryHttp', () => {
     expect(repo instanceof ElevatorRepository).toBe(true);
   });
 
-  test('methods throw Not implemented', async () => {
+  test('can save and retrieve elevators', async () => {
     const repo = new ElevatorRepositoryHttp();
-    await expect(repo.findAll()).rejects.toThrow('Not implemented');
-    await expect(repo.findById('id')).rejects.toThrow('Not implemented');
-    await expect(repo.save({})).rejects.toThrow('Not implemented');
+    const e1 = { id: 'E1' };
+    const e2 = { id: 'E2' };
+    await repo.save(e1);
+    await repo.save(e2);
+    const all = await repo.findAll();
+    expect(all).toEqual([e1, e2]);
+    const found = await repo.findById('E1');
+    expect(found).toBe(e1);
   });
 });
