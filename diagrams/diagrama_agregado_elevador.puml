@@ -1,0 +1,29 @@
+@startuml
+' Diagrama de agregado para el Elevator Aggregate
+
+package domain.entity {
+  class Elevator <<AggregateRoot>> {
+    - id : String
+    - currentFloor : FloorNumber
+    - targetFloors : List<FloorNumber>
+    - state : ElevatorState
+    + move() : void
+    + addDestination(floor : FloorNumber) : void
+  }
+}
+
+package domain.valueobject {
+  class FloorNumber <<ValueObject>> {
+    - value : int
+  }
+  class ElevatorState <<ValueObject>> {
+    - value : enum {Idle, MovingUp, MovingDown, Loading}
+  }
+}
+
+' Relaciones de composición dentro del agregado
+Elevator *-- FloorNumber : currentFloor
+Elevator *-- "0..*" FloorNumber : targetFloors
+Elevator *-- ElevatorState   : state
+
+@enduml
