@@ -1,0 +1,35 @@
+{
+  "name": "elevator-sim",
+  "version": "1.0.0",
+  "description": "Sistema de Control de Ascensores — Simulación académica con ReactJS y Vercel serverless",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1",
+    "jest": "^30.0.5"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/domain",
+      "<rootDir>/__tests__"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
+  }
+}
