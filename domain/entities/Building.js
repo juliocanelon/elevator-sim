@@ -35,6 +35,10 @@ class Building {
         }
       }
 
+      if (elevator.targetFloors.length > 0 || state !== 'Idle') {
+        score += 1000;
+      }
+
       if (score < bestScore) {
         bestScore = score;
         best = elevator;

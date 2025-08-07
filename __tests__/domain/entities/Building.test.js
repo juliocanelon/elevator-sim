@@ -28,4 +28,17 @@ describe('Building', () => {
     expect(e1.targetFloors[0].value).toBe(2);
     expect(e2.targetFloors).toHaveLength(0);
   });
+
+  test('prefers elevator with empty queue for new call', () => {
+    const e1 = new Elevator('A1', 1);
+    const e2 = new Elevator('A2', 1);
+    const building = new Building([e1, e2]);
+
+    building.handleDestination(new DestinationRequest(5));
+
+    building.handleCall(new CallRequest(3, 'Up'));
+
+    expect(e1.targetFloors.map(f => f.value)).toEqual([5]);
+    expect(e2.targetFloors[0].value).toBe(3);
+  });
 });
