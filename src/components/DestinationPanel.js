@@ -1,20 +1,22 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 import { useElevator } from '../context/ElevatorContext';
 
 function DestinationPanel({ elevatorId, floors }) {
   const { selectDestination } = useElevator();
 
   return (
-    <div className="btn-group flex-wrap">
+    <div className="d-flex flex-wrap justify-content-center">
       {floors.map(f => (
-        <button
+        <Button
           key={f}
-          type="button"
-          className="btn btn-sm btn-light m-1"
+          size="sm"
+          variant="light"
+          className="m-1"
           onClick={() => selectDestination(elevatorId, f)}
         >
           {f}
-        </button>
+        </Button>
       ))}
     </div>
   );

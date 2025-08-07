@@ -1,10 +1,22 @@
 import React, { useEffect } from 'react';
+import { Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import { useElevator } from '../context/ElevatorContext';
 import FloorButton from './FloorButton';
 import DestinationPanel from './DestinationPanel';
 
 const FLOOR_COUNT = 5;
-const FLOOR_HEIGHT = 80;
+
+function getBadgeVariant(state) {
+  switch (state) {
+    case 'MovingUp':
+    case 'MovingDown':
+      return 'warning';
+    case 'Loading':
+      return 'danger';
+    default:
+      return 'secondary';
+  }
+}
 
 function ElevatorSimulation() {
   const { elevators, tick } = useElevator();
@@ -18,48 +30,51 @@ function ElevatorSimulation() {
   }, [tick]);
 
   return (
-    <div className="container mt-4">
-      <div className="row">
-        <div className="col-3">
-          {floors
-            .slice()
-            .reverse()
-            .map(f => (
-              <div
-                key={f}
-                className="d-flex align-items-center justify-content-between mb-2"
-                style={{ height: FLOOR_HEIGHT }}
-              >
-                <span className="me-2">Floor {f}</span>
-                <FloorButton floor={f} />
-              </div>
-            ))}
-        </div>
-        <div className="col-9">
-          <div
-            className="position-relative border"
-            style={{ height: FLOOR_COUNT * FLOOR_HEIGHT }}
-          >
-            {elevators.map((e, i) => (
-              <div
-                key={e.id}
-                className="bg-primary text-white p-2 rounded position-absolute"
-                style={{
-                  width: 80,
-                  height: FLOOR_HEIGHT - 10,
-                  left: i * 100,
-                  transition: 'top 1s linear',
-                  top: (FLOOR_COUNT - e.currentFloor) * FLOOR_HEIGHT,
-                }}
-              >
-                <div className="mb-2">Elev {e.id}</div>
-                <DestinationPanel elevatorId={e.id} floors={floors} />
+    <Container className="mt-4">
+      <Row>
+        <Col sm={3}>
+          <div className="floor-panel">
+            {floors
+              .slice()
+              .reverse()
+              .map(f => (
+                <div
+                  key={f}
+                  className="d-flex align-items-center justify-content-between mb-2"
+                  style={{ height: 'var(--floor-height)' }}
+                >
+                  <span className="me-2">Floor {f}</span>
+                  <FloorButton floor={f} />
+                </div>
+              ))}
+          </div>
+        </Col>
+        <Col sm={9}>
+          <div className="building">
+            {elevators.map(e => (
+              <div key={e.id} className="shaft">
+                <div
+                  className="cabin"
+                  style={{
+                    transform: `translateY(calc((${FLOOR_COUNT} - ${e.currentFloor}) * var(--floor-height)))`,
+                  }}
+                >
+                  <Badge bg={getBadgeVariant(e.state)} className="mb-1">
+                    {e.state}
+                  </Badge>
+                  <Card className="shadow-sm rounded w-100">
+                    <Card.Body className="p-2">
+                      <div className="mb-2 text-center">Elev {e.id}</div>
+                      <DestinationPanel elevatorId={e.id} floors={floors} />
+                    </Card.Body>
+                  </Card>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
