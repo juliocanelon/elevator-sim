@@ -1,15 +1,17 @@
 class HandleExternalCall {
-    constructor(callRepository, elevatorRepository) {
-      this.callRepository = callRepository;
-      this.elevatorRepository = elevatorRepository;
+  constructor(dispatcher, eventPublisher) {
+    this.dispatcher = dispatcher;
+    this.eventPublisher = eventPublisher;
+  }
+
+  async execute(request) {
+    if (this.dispatcher && typeof this.dispatcher.dispatchCall === 'function') {
+      await this.dispatcher.dispatchCall(request);
     }
-  
-    async execute(request) {
-      await this.callRepository.enqueue(request);
-      if (typeof this.elevatorRepository.save === 'function') {
-        await this.elevatorRepository.save();
-      }
+    if (this.eventPublisher && typeof this.eventPublisher.publish === 'function') {
+      await this.eventPublisher.publish({ type: 'CallQueued', request });
     }
   }
-  
-  module.exports = HandleExternalCall;
+}
+
+module.exports = HandleExternalCall;

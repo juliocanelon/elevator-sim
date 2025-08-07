@@ -2,15 +2,15 @@ const HandleExternalCall = require('../../application/HandleExternalCall');
 const CallRequest = require('../../domain/entities/CallRequest');
 
 describe('HandleExternalCall', () => {
-  test('enqueues request and saves elevator if assigned immediately', async () => {
-    const mockCallRepo = { enqueue: jest.fn() };
-    const mockElevatorRepo = { save: jest.fn() };
-    const handler = new HandleExternalCall(mockCallRepo, mockElevatorRepo);
+  test('dispatches call through dispatcher and publishes event', async () => {
+    const dispatcher = { dispatchCall: jest.fn() };
+    const publisher = { publish: jest.fn() };
+    const handler = new HandleExternalCall(dispatcher, publisher);
     const req = new CallRequest(3, 'Up');
 
     await handler.execute(req);
 
-    expect(mockCallRepo.enqueue).toHaveBeenCalledWith(req);
-    expect(mockElevatorRepo.save).toHaveBeenCalled();
+    expect(dispatcher.dispatchCall).toHaveBeenCalledWith(req);
+    expect(publisher.publish).toHaveBeenCalledWith({ type: 'CallQueued', request: req });
   });
 });
