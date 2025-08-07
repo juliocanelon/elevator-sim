@@ -39,4 +39,17 @@ describe('api/call', () => {
     await api(req, res);
     expect(res.status).toHaveBeenCalledWith(405);
   });
+
+  test('returns 400 when handler fails', async () => {
+    const exec = jest.fn().mockRejectedValue(new Error('bad'));
+    HandleExternalCall.mockImplementation(() => ({ execute: exec }));
+
+    const req = { method: 'POST', body: JSON.stringify({ floor: 1, direction: 'Up' }), on: jest.fn() };
+    const res = createRes();
+
+    await api(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'bad' });
+  });
 });
