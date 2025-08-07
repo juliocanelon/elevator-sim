@@ -40,4 +40,30 @@ describe('api/tick', () => {
 
     expect(res.status).toHaveBeenCalledWith(405);
   });
+
+  test('supports GET method', async () => {
+    const exec = jest.fn();
+    HandleTick.mockImplementation(() => ({ execute: exec }));
+
+    const req = { method: 'GET' };
+    const res = createRes();
+
+    await api(req, res);
+
+    expect(exec).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test('returns 500 when handler fails', async () => {
+    const exec = jest.fn().mockRejectedValue(new Error('oops'));
+    HandleTick.mockImplementation(() => ({ execute: exec }));
+
+    const req = { method: 'POST' };
+    const res = createRes();
+
+    await api(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'oops' });
+  });
 });
