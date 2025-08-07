@@ -1,32 +1,26 @@
 const HandleTick = require('../../application/HandleTick');
-const CallRequest = require('../../domain/entities/CallRequest');
-const DestinationRequest = require('../../domain/entities/DestinationRequest');
 const Elevator = require('../../domain/entities/Elevator');
 
 describe('HandleTick', () => {
-  test('processes queues and moves elevators', async () => {
-    const mockCallRepo = { dequeueAll: jest.fn().mockResolvedValue([new CallRequest(1, 'Up')]) };
-    const mockDestRepo = { dequeueAll: jest.fn().mockResolvedValue([new DestinationRequest(4)]) };
+  test('delegates tick to dispatcher and publishes elevator updates', async () => {
     const elevator = new Elevator('E1');
-    jest.spyOn(elevator, 'move');
-    const mockElevatorRepo = {
-      findAll: jest.fn().mockResolvedValue([elevator]),
-      save: jest.fn()
-    };
-    const timeProvider = { now: jest.fn().mockReturnValue(Date.now()) };
-    const dispatcher = {
-      dispatchCall: jest.fn(),
-      dispatchDestination: jest.fn()
-    };
-    const handler = new HandleTick(mockCallRepo, mockDestRepo, mockElevatorRepo, dispatcher, timeProvider);
+    const elevatorRepo = { findAll: jest.fn().mockResolvedValue([elevator]) };
+    const dispatcher = { handleTick: jest.fn(), elevatorRepo };
+    const publisher = { publish: jest.fn() };
+    const timeProvider = { now: jest.fn().mockReturnValue(123) };
+    const handler = new HandleTick(dispatcher, publisher, timeProvider);
 
     await handler.execute();
 
-    expect(mockCallRepo.dequeueAll).toHaveBeenCalled();
-    expect(mockDestRepo.dequeueAll).toHaveBeenCalled();
-    expect(dispatcher.dispatchCall).toHaveBeenCalled();
-    expect(dispatcher.dispatchDestination).toHaveBeenCalled();
-    expect(elevator.move).toHaveBeenCalled();
-    expect(mockElevatorRepo.save).toHaveBeenCalledWith(elevator);
+    expect(dispatcher.handleTick).toHaveBeenCalledWith(timeProvider);
+    expect(elevatorRepo.findAll).toHaveBeenCalled();
+    expect(publisher.publish).toHaveBeenCalledWith({
+      type: 'ElevatorUpdated',
+      id: elevator.id,
+      floor: elevator.currentFloor.value,
+      state: elevator.state.value,
+      targets: [],
+      timestamp: 123,
+    });
   });
 });

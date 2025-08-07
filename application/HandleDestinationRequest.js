@@ -1,15 +1,17 @@
 class HandleDestinationRequest {
-    constructor(destinationRepository, elevatorRepository) {
-      this.destinationRepository = destinationRepository;
-      this.elevatorRepository = elevatorRepository;
+  constructor(dispatcher, eventPublisher) {
+    this.dispatcher = dispatcher;
+    this.eventPublisher = eventPublisher;
+  }
+
+  async execute(request) {
+    if (this.dispatcher && typeof this.dispatcher.dispatchDestination === 'function') {
+      await this.dispatcher.dispatchDestination(request);
     }
-  
-    async execute(request) {
-      await this.destinationRepository.enqueue(request);
-      if (typeof this.elevatorRepository.save === 'function') {
-        await this.elevatorRepository.save();
-      }
+    if (this.eventPublisher && typeof this.eventPublisher.publish === 'function') {
+      await this.eventPublisher.publish({ type: 'DestinationQueued', request });
     }
   }
-  
-  module.exports = HandleDestinationRequest;
+}
+
+module.exports = HandleDestinationRequest;
