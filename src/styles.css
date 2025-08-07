@@ -1,0 +1,46 @@
+:root {
+  --primary: #0d6efd;
+  --idle: #6c757d;
+  --moving: #fd7e14;
+  --loading: #dc3545;
+  --floor-height: 100px;
+}
+
+.building {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, var(--floor-height));
+  gap: 16px;
+}
+
+@media (max-width: 575.98px) {
+  .building {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shaft {
+  grid-row: 1 / -1;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cabin {
+  position: absolute;
+  width: 100%;
+  transition: transform 0.4s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.floor-panel {
+  position: sticky;
+  top: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 8px;
+}
