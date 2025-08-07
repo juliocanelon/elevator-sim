@@ -9,8 +9,8 @@ const TimeProviderSystem = require('./TimeProviderSystem');
 const callRepo = new CallRequestRepositoryMemory();
 const destRepo = new DestinationRequestRepositoryMemory();
 const elevatorRepo = new ElevatorRepositoryHttp([
-  new Elevator('E1', 1),
-  new Elevator('E2', 5)
+  new Elevator('A1', 1),
+  new Elevator('A2', 5)
 ]);
 
 const dispatcher = new ElevatorDispatcher(elevatorRepo, callRepo, destRepo);

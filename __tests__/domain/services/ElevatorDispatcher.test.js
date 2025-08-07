@@ -38,7 +38,7 @@ describe('ElevatorDispatcher', () => {
   });
 
   test('handleTick moves elevators and saves state', async () => {
-    const elevator = new Elevator('E1');
+    const elevator = new Elevator('A1');
     elevatorRepo.findAll.mockResolvedValue([elevator]);
     callRepo.dequeueAll.mockResolvedValue([]);
     destRepo.dequeueAll.mockResolvedValue([]);

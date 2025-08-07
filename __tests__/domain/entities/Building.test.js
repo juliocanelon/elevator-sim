@@ -6,8 +6,8 @@ const ElevatorState = require('../../../domain/valueobjects/ElevatorState');
 
 describe('Building', () => {
   test('assigns call to closest elevator considering direction', () => {
-    const e1 = new Elevator('E1', 1);
-    const e2 = new Elevator('E2', 5);
+    const e1 = new Elevator('A1', 1);
+    const e2 = new Elevator('A2', 5);
     e1.state = new ElevatorState('Idle');
     e2.state = new ElevatorState('Idle');
     const building = new Building([e1, e2]);
@@ -19,8 +19,8 @@ describe('Building', () => {
   });
 
   test('assigns destination to nearest elevator', () => {
-    const e1 = new Elevator('E1', 1);
-    const e2 = new Elevator('E2', 5);
+    const e1 = new Elevator('A1', 1);
+    const e2 = new Elevator('A2', 5);
     const building = new Building([e1, e2]);
 
     building.handleDestination(new DestinationRequest(2));

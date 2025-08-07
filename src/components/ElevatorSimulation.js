@@ -40,14 +40,14 @@ function ElevatorSimulation() {
             className="position-relative border"
             style={{ height: FLOOR_COUNT * FLOOR_HEIGHT }}
           >
-            {elevators.map(e => (
+            {elevators.map((e, i) => (
               <div
                 key={e.id}
                 className="bg-primary text-white p-2 rounded position-absolute"
                 style={{
                   width: 80,
                   height: FLOOR_HEIGHT - 10,
-                  left: (e.id - 1) * 100,
+                  left: i * 100,
                   transition: 'top 1s linear',
                   top: (FLOOR_COUNT - e.currentFloor) * FLOOR_HEIGHT,
                 }}

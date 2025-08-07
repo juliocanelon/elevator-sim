@@ -11,8 +11,8 @@ const ElevatorRepositoryHttp = require('../../../infrastructure/ElevatorReposito
 describe('ElevatorDispatcher integration', () => {
   test('processes calls and destinations for multiple elevators', async () => {
     const elevatorRepo = new ElevatorRepositoryHttp([
-      new Elevator('E1', 1),
-      new Elevator('E2', 5)
+      new Elevator('A1', 1),
+      new Elevator('A2', 5)
     ]);
     const callRepo = new CallRequestRepositoryMemory();
     const destRepo = new DestinationRequestRepositoryMemory();
@@ -23,8 +23,8 @@ describe('ElevatorDispatcher integration', () => {
 
     await dispatcher.handleTick({ now: () => Date.now() });
 
-    let e1 = await elevatorRepo.findById('E1');
-    let e2 = await elevatorRepo.findById('E2');
+    let e1 = await elevatorRepo.findById('A1');
+    let e2 = await elevatorRepo.findById('A2');
     expect(e1.currentFloor.value).toBe(2);
     expect(e1.state.value).toBe('MovingUp');
     expect(e1.targetFloors[0].value).toBe(2);
@@ -34,8 +34,8 @@ describe('ElevatorDispatcher integration', () => {
 
     await dispatcher.handleTick({ now: () => Date.now() });
 
-    e1 = await elevatorRepo.findById('E1');
-    e2 = await elevatorRepo.findById('E2');
+    e1 = await elevatorRepo.findById('A1');
+    e2 = await elevatorRepo.findById('A2');
     expect(e1.currentFloor.value).toBe(2);
     expect(e1.state.value).toBe('Loading');
     expect(e1.targetFloors.length).toBe(0);

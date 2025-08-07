@@ -6,8 +6,8 @@ const ElevatorState = require('../../../domain/valueobjects/ElevatorState');
 
 describe('ElevatorDispatcher with multiple elevators', () => {
   test('dispatches requests to nearest elevators', async () => {
-    const e1 = new Elevator('E1', 1);
-    const e2 = new Elevator('E2', 5);
+    const e1 = new Elevator('A1', 1);
+    const e2 = new Elevator('A2', 5);
     e1.state = new ElevatorState('Idle');
     e2.state = new ElevatorState('Idle');
 
