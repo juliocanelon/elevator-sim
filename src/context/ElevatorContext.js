@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ElevatorContext = createContext();
 
@@ -10,6 +10,32 @@ const initialElevators = [
 
 export const ElevatorProvider = ({ children }) => {
   const [elevators, setElevators] = useState(initialElevators);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElevators(prev =>
+        prev.map(e => {
+          if (e.targetFloors.length === 0) {
+            return { ...e, state: 'Idle' };
+          }
+          const target = e.targetFloors[0];
+          if (e.currentFloor < target) {
+            return { ...e, currentFloor: e.currentFloor + 1, state: 'MovingUp' };
+          }
+          if (e.currentFloor > target) {
+            return { ...e, currentFloor: e.currentFloor - 1, state: 'MovingDown' };
+          }
+          const remaining = e.targetFloors.slice(1);
+          return {
+            ...e,
+            targetFloors: remaining,
+            state: remaining.length === 0 ? 'Idle' : e.state,
+          };
+        })
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const callElevator = (floor, _direction) => {
     setElevators(prev => {
@@ -25,7 +51,7 @@ export const ElevatorProvider = ({ children }) => {
               ...e,
               targetFloors: e.targetFloors.includes(floor)
                 ? e.targetFloors
-                : [...e.targetFloors, floor]
+                : [...e.targetFloors, floor],
             }
           : e
       );
@@ -40,7 +66,7 @@ export const ElevatorProvider = ({ children }) => {
               ...e,
               targetFloors: e.targetFloors.includes(floor)
                 ? e.targetFloors
-                : [...e.targetFloors, floor]
+                : [...e.targetFloors, floor],
             }
           : e
       )
