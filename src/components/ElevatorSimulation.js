@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useElevator } from '../context/ElevatorContext';
 import FloorButton from './FloorButton';
 import DestinationPanel from './DestinationPanel';
@@ -7,8 +7,15 @@ const FLOOR_COUNT = 5;
 const FLOOR_HEIGHT = 80;
 
 function ElevatorSimulation() {
-  const { elevators } = useElevator();
+  const { elevators, tick } = useElevator();
   const floors = Array.from({ length: FLOOR_COUNT }, (_, i) => i + 1);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      tick();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [tick]);
 
   return (
     <div className="container mt-4">
