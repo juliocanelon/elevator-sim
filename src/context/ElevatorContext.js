@@ -3,9 +3,8 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 const ElevatorContext = createContext();
 
 const initialElevators = [
-  { id: 1, currentFloor: 1, targetFloors: [], state: 'Idle' },
-  { id: 2, currentFloor: 1, targetFloors: [], state: 'Idle' },
-  { id: 3, currentFloor: 1, targetFloors: [], state: 'Idle' }
+  { id: 'A1', currentFloor: 1, targetFloors: [], state: 'Idle' },
+  { id: 'A2', currentFloor: 1, targetFloors: [], state: 'Idle' },
 ];
 
 export const ElevatorProvider = ({ children }) => {

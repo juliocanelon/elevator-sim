@@ -13,7 +13,8 @@ it('renders floors and elevators', () => {
     </ElevatorProvider>
   );
   expect(screen.getByText('Floor 1')).toBeInTheDocument();
-  expect(screen.getByText('Elev 1')).toBeInTheDocument();
+  expect(screen.getByText('Elev A1')).toBeInTheDocument();
+  expect(screen.getByText('Elev A2')).toBeInTheDocument();
 });
 
 // Test callElevator integrates with API and updates context
@@ -42,7 +43,7 @@ it('selectDestination updates targets and tick calls API', async () => {
   const { result } = renderHook(() => useElevator(), { wrapper: ElevatorProvider });
 
   await act(async () => {
-    await result.current.selectDestination(1, 2);
+    await result.current.selectDestination('A1', 2);
   });
   expect(result.current.elevators[0].targetFloors).toContain(2);
 

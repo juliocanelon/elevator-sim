@@ -2,6 +2,8 @@
 
 Una prueba de concepto académica que implementa una metodología ágil OO-Clean-DDD de principio a fin.
 
+La simulación actual modela **dos ascensores (A1 y A2)** en un edificio de cinco pisos.
+
 ## Frontend
 - **React.js (ES6+)** con componentes reutilizables, hooks y Context API.
 

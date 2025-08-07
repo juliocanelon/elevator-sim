@@ -3,7 +3,7 @@ const Elevator = require('../../domain/entities/Elevator');
 
 describe('HandleTick', () => {
   test('delegates tick to dispatcher and publishes elevator updates', async () => {
-    const elevator = new Elevator('E1');
+    const elevator = new Elevator('A1');
     const elevatorRepo = { findAll: jest.fn().mockResolvedValue([elevator]) };
     const dispatcher = { handleTick: jest.fn(), elevatorRepo };
     const publisher = { publish: jest.fn() };

@@ -9,13 +9,13 @@ describe('ElevatorRepositoryHttp', () => {
 
   test('can save and retrieve elevators', async () => {
     const repo = new ElevatorRepositoryHttp();
-    const e1 = { id: 'E1' };
-    const e2 = { id: 'E2' };
+    const e1 = { id: 'A1' };
+    const e2 = { id: 'A2' };
     await repo.save(e1);
     await repo.save(e2);
     const all = await repo.findAll();
     expect(all).toEqual([e1, e2]);
-    const found = await repo.findById('E1');
+    const found = await repo.findById('A1');
     expect(found).toBe(e1);
   });
 });
