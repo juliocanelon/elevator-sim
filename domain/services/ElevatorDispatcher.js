@@ -18,15 +18,14 @@ class ElevatorDispatcher {
   async handleTick(timeProvider) {
     const elevators = await this.elevatorRepo.findAll();
     const building = new Building(elevators);
-    const calls = await this.callRepo.dequeueAll();
     const destinations = await this.destRepo.dequeueAll();
-
-    for (const call of calls) {
-      building.handleCall(call);
-    }
-
     for (const dest of destinations) {
       building.handleDestination(dest);
+    }
+
+    const calls = await this.callRepo.dequeueAll();
+    for (const call of calls) {
+      building.handleCall(call);
     }
 
     for (const elevator of building.getElevators()) {
