@@ -7,20 +7,24 @@ function FloorButton({ floor }) {
 
   return (
     <div className="btn-group">
-      <Button
-        size="sm"
-        variant="outline-primary"
-        onClick={() => callElevator(floor, 'Up')}
-      >
-        <i className="fa-solid fa-arrow-up"></i>
-      </Button>
-      <Button
-        size="sm"
-        variant="outline-primary"
-        onClick={() => callElevator(floor, 'Down')}
-      >
-        <i className="fa-solid fa-arrow-down"></i>
-      </Button>
+      {floor !== 5 && (
+        <Button
+          size="sm"
+          variant="outline-primary"
+          onClick={() => callElevator(floor, 'Up')}
+        >
+          <i className="fa-solid fa-arrow-up"></i>
+        </Button>
+      )}
+      {floor !== 1 && (
+        <Button
+          size="sm"
+          variant="outline-primary"
+          onClick={() => callElevator(floor, 'Down')}
+        >
+          <i className="fa-solid fa-arrow-down"></i>
+        </Button>
+      )}
     </div>
   );
 }

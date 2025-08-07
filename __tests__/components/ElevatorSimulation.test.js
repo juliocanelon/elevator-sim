@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, renderHook, act } from '@testing-library/react';
+import { render, screen, renderHook, act, within } from '@testing-library/react';
 import ElevatorSimulation from '../../src/components/ElevatorSimulation';
 import { ElevatorProvider, useElevator } from '../../src/context/ElevatorContext';
 
@@ -15,6 +15,25 @@ it('renders floors and elevators', () => {
   expect(screen.getByText('Floor 1')).toBeInTheDocument();
   expect(screen.getByText('Elev A1')).toBeInTheDocument();
   expect(screen.getByText('Elev A2')).toBeInTheDocument();
+});
+
+it('renders appropriate call buttons on each floor', () => {
+  render(
+    <ElevatorProvider>
+      <ElevatorSimulation />
+    </ElevatorProvider>
+  );
+
+  const floor1 = within(screen.getByText('Floor 1').parentElement).getAllByRole('button');
+  expect(floor1).toHaveLength(1);
+  expect(floor1[0].querySelector('.fa-arrow-up')).toBeInTheDocument();
+
+  const floor3 = within(screen.getByText('Floor 3').parentElement).getAllByRole('button');
+  expect(floor3).toHaveLength(2);
+
+  const floor5 = within(screen.getByText('Floor 5').parentElement).getAllByRole('button');
+  expect(floor5).toHaveLength(1);
+  expect(floor5[0].querySelector('.fa-arrow-down')).toBeInTheDocument();
 });
 
 // Test callElevator integrates with API and updates context
