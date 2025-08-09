@@ -14,8 +14,17 @@
 }
 
 @media (max-width: 575.98px) {
+  :root {
+    --floor-height: 60px;
+  }
+
   .building {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .floor-panel {
+    top: 8px;
   }
 }
 
