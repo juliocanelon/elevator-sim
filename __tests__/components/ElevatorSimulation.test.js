@@ -15,6 +15,7 @@ it('renders floors and elevators', () => {
   expect(screen.getByText('Floor 1')).toBeInTheDocument();
   expect(screen.getByText('Elev A1')).toBeInTheDocument();
   expect(screen.getByText('Elev A2')).toBeInTheDocument();
+  expect(screen.getAllByText('Current Floor: 1')).toHaveLength(2);
 });
 
 it('renders appropriate call buttons on each floor', () => {
