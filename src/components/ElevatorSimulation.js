@@ -65,6 +65,7 @@ function ElevatorSimulation() {
                   <Card className="shadow-sm rounded w-100">
                     <Card.Body className="p-2">
                       <div className="mb-2 text-center">Elev {e.id}</div>
+                      <div className="mb-2 text-center">Current Floor: {e.currentFloor}</div>
                       <DestinationPanel elevatorId={e.id} floors={floors} />
                     </Card.Body>
                   </Card>
