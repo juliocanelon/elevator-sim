@@ -1,0 +1,38 @@
+@startuml
+' Diagrama de arquitectura general del proyecto
+
+package "domain" {
+  package "entities"
+  package "valueobjects"
+  package "services"
+}
+
+package "application" {
+  class HandleExternalCall
+  class HandleDestinationRequest
+  class HandleTick
+  package "ports"
+}
+
+package "infrastructure" {
+  class CallRequestRepositoryMemory
+  class DestinationRequestRepositoryMemory
+  class ElevatorRepositoryHttp
+  class EventPublisherConsole
+  class TimeProviderSystem
+}
+
+package "api" {
+  [Serverless Functions]
+}
+
+package "src" {
+  [React Components]
+}
+
+application --> domain : usa
+infrastructure --> application : implementa
+api --> application : invoca
+src --> api : consume
+
+@enduml
