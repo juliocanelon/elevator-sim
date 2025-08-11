@@ -9,6 +9,7 @@ const initialElevators = [
 
 export const ElevatorProvider = ({ children }) => {
   const [elevators, setElevators] = useState(initialElevators);
+  const [hallCalls, setHallCalls] = useState([]);
 
   const tick = useCallback(async () => {
     try {
@@ -16,6 +17,7 @@ export const ElevatorProvider = ({ children }) => {
     } catch (err) {
       console.error('tick failed', err);
     }
+    const reachedFloors = [];
     setElevators(prev =>
       prev.map(e => {
         if (e.targetFloors.length === 0) {
@@ -28,6 +30,10 @@ export const ElevatorProvider = ({ children }) => {
         if (e.currentFloor > target) {
           return { ...e, currentFloor: e.currentFloor - 1, state: 'MovingDown' };
         }
+        if (typeof window !== 'undefined') {
+          new Audio('/beep.mp3').play();
+        }
+        reachedFloors.push(target);
         const remaining = e.targetFloors.slice(1);
         return {
           ...e,
@@ -36,6 +42,9 @@ export const ElevatorProvider = ({ children }) => {
         };
       })
     );
+    if (reachedFloors.length > 0) {
+      setHallCalls(prev => prev.filter(c => !reachedFloors.includes(c.floor)));
+    }
   }, []);
 
   const callElevator = async (floor, direction) => {
@@ -48,6 +57,11 @@ export const ElevatorProvider = ({ children }) => {
     } catch (err) {
       console.error('call failed', err);
     }
+    setHallCalls(prev =>
+      prev.some(c => c.floor === floor && c.direction === direction)
+        ? prev
+        : [...prev, { floor, direction }]
+    );
     setElevators(prev => {
       const best = prev.reduce((prevElevator, curr) => {
         const prevDist = Math.abs(prevElevator.currentFloor - floor);
@@ -84,7 +98,9 @@ export const ElevatorProvider = ({ children }) => {
   };
 
   return (
-    <ElevatorContext.Provider value={{ elevators, callElevator, selectDestination, tick }}>
+    <ElevatorContext.Provider
+      value={{ elevators, hallCalls, callElevator, selectDestination, tick }}
+    >
       {children}
     </ElevatorContext.Provider>
   );

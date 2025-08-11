@@ -18,6 +18,19 @@ function getBadgeVariant(state) {
   }
 }
 
+function getBadgeText(state) {
+  switch (state) {
+    case 'MovingUp':
+      return '↑';
+    case 'MovingDown':
+      return '↓';
+    case 'Idle':
+      return 'Inactivo';
+    default:
+      return state;
+  }
+}
+
 function ElevatorSimulation() {
   const { elevators, tick } = useElevator();
   const floors = Array.from({ length: FLOOR_COUNT }, (_, i) => i + 1);
@@ -59,8 +72,9 @@ function ElevatorSimulation() {
                     transform: `translateY(calc((${FLOOR_COUNT} - ${e.currentFloor}) * var(--floor-height)))`,
                   }}
                 >
+                  <div className="floor-indicator mb-1">{e.currentFloor}</div>
                   <Badge bg={getBadgeVariant(e.state)} className="mb-1">
-                    {e.state}
+                    {getBadgeText(e.state)}
                   </Badge>
                   <Card className="shadow-sm rounded w-100">
                     <Card.Body className="p-2">
