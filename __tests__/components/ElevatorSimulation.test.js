@@ -1,20 +1,29 @@
 /** @jest-environment jsdom */
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, renderHook, act, within } from '@testing-library/react';
+import { render, screen, renderHook, act, within, waitFor } from '@testing-library/react';
 import ElevatorSimulation from '../../src/components/ElevatorSimulation';
 import { ElevatorProvider, useElevator } from '../../src/context/ElevatorContext';
 
+beforeEach(() => {
+  global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([
+    { id: 'A1', currentFloor: 1, state: 'Idle', targetFloors: [] },
+    { id: 'A2', currentFloor: 5, state: 'Idle', targetFloors: [] }
+  ]) }));
+});
+
 // Test component rendering
-it('renders floors and elevators', () => {
-  render(
-    <ElevatorProvider>
-      <ElevatorSimulation />
-    </ElevatorProvider>
-  );
-  expect(screen.getByText('Floor 1')).toBeInTheDocument();
-  expect(screen.getByText('Elev A1')).toBeInTheDocument();
-  expect(screen.getByText('Elev A2')).toBeInTheDocument();
+it('renders floors and elevators', async () => {
+  await act(async () => {
+    render(
+      <ElevatorProvider>
+        <ElevatorSimulation />
+      </ElevatorProvider>
+    );
+  });
+  await screen.findByText('Floor 1');
+  await screen.findByText('Elev A1');
+  await screen.findByText('Elev A2');
 });
 
 it('renders appropriate call buttons on each floor', () => {
@@ -38,14 +47,29 @@ it('renders appropriate call buttons on each floor', () => {
 
 // Test callElevator integrates with API and updates context
 it('callElevator updates state and calls API', async () => {
-  global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+  const initial = [
+    { id: 'A1', currentFloor: 1, state: 'Idle', targetFloors: [] },
+    { id: 'A2', currentFloor: 5, state: 'Idle', targetFloors: [] }
+  ];
+  const afterCall = [
+    { id: 'A1', currentFloor: 1, state: 'Idle', targetFloors: [3] },
+    { id: 'A2', currentFloor: 5, state: 'Idle', targetFloors: [] }
+  ];
+  global.fetch = jest
+    .fn()
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(initial) })
+    .mockResolvedValueOnce({ ok: true })
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(afterCall) });
+
   const { result } = renderHook(() => useElevator(), { wrapper: ElevatorProvider });
+  await waitFor(() => expect(result.current.elevators.length).toBe(2));
 
   await act(async () => {
     await result.current.callElevator(3, 'Up');
   });
 
-  expect(global.fetch).toHaveBeenCalledWith(
+  expect(global.fetch).toHaveBeenNthCalledWith(
+    2,
     '/api/call',
     expect.objectContaining({
       method: 'POST',
@@ -58,18 +82,33 @@ it('callElevator updates state and calls API', async () => {
 
 // Test selectDestination and tick integration
 it('selectDestination updates targets and tick calls API', async () => {
-  global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+  const initial = [
+    { id: 'A1', currentFloor: 1, state: 'Idle', targetFloors: [] },
+    { id: 'A2', currentFloor: 5, state: 'Idle', targetFloors: [] }
+  ];
+  const afterTick = [
+    { id: 'A1', currentFloor: 2, state: 'Idle', targetFloors: [] },
+    { id: 'A2', currentFloor: 5, state: 'Idle', targetFloors: [] }
+  ];
+  global.fetch = jest
+    .fn()
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(initial) })
+    .mockResolvedValueOnce({ ok: true })
+    .mockResolvedValueOnce({ ok: true })
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(afterTick) });
+
   const { result } = renderHook(() => useElevator(), { wrapper: ElevatorProvider });
+  await waitFor(() => expect(result.current.elevators.length).toBe(2));
 
   await act(async () => {
     await result.current.selectDestination('A1', 2);
   });
-  expect(result.current.elevators[0].targetFloors).toContain(2);
+  await waitFor(() => expect(result.current.elevators[0].targetFloors).toContain(2));
 
   await act(async () => {
     await result.current.tick();
   });
 
-  expect(global.fetch).toHaveBeenCalledWith('/api/tick', { method: 'POST' });
+  expect(global.fetch).toHaveBeenNthCalledWith(3, '/api/tick', { method: 'POST' });
   expect(result.current.elevators[0].currentFloor).toBe(2);
 });

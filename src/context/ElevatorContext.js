@@ -1,42 +1,34 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const ElevatorContext = createContext();
 
-const initialElevators = [
-  { id: 'A1', currentFloor: 1, targetFloors: [], state: 'Idle' },
-  { id: 'A2', currentFloor: 1, targetFloors: [], state: 'Idle' },
-];
-
 export const ElevatorProvider = ({ children }) => {
-  const [elevators, setElevators] = useState(initialElevators);
+  const [elevators, setElevators] = useState([]);
+
+  const loadElevators = useCallback(async () => {
+    try {
+      const res = await fetch('/api/elevators');
+      if (res.ok) {
+        const data = await res.json();
+        setElevators(data);
+      }
+    } catch (err) {
+      console.error('failed to load elevators', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadElevators();
+  }, [loadElevators]);
 
   const tick = useCallback(async () => {
     try {
       await fetch('/api/tick', { method: 'POST' });
+      await loadElevators();
     } catch (err) {
       console.error('tick failed', err);
     }
-    setElevators(prev =>
-      prev.map(e => {
-        if (e.targetFloors.length === 0) {
-          return { ...e, state: 'Idle' };
-        }
-        const target = e.targetFloors[0];
-        if (e.currentFloor < target) {
-          return { ...e, currentFloor: e.currentFloor + 1, state: 'MovingUp' };
-        }
-        if (e.currentFloor > target) {
-          return { ...e, currentFloor: e.currentFloor - 1, state: 'MovingDown' };
-        }
-        const remaining = e.targetFloors.slice(1);
-        return {
-          ...e,
-          targetFloors: remaining,
-          state: remaining.length === 0 ? 'Idle' : e.state,
-        };
-      })
-    );
-  }, []);
+  }, [loadElevators]);
 
   const callElevator = async (floor, direction) => {
     try {
@@ -45,32 +37,15 @@ export const ElevatorProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ floor, direction }),
       });
+      await loadElevators();
     } catch (err) {
       console.error('call failed', err);
     }
-    setElevators(prev => {
-      const best = prev.reduce((prevElevator, curr) => {
-        const prevDist = Math.abs(prevElevator.currentFloor - floor);
-        const currDist = Math.abs(curr.currentFloor - floor);
-        return currDist < prevDist ? curr : prevElevator;
-      }, prev[0]);
-
-      return prev.map(e =>
-        e.id === best.id
-          ? {
-              ...e,
-              targetFloors: e.targetFloors.includes(floor)
-                ? e.targetFloors
-                : [...e.targetFloors, floor],
-            }
-          : e
-      );
-    });
   };
 
   const selectDestination = async (elevatorId, floor) => {
-    setElevators(prev =>
-      prev.map(e =>
+    setElevators(prev => {
+      const updated = prev.map(e =>
         e.id === elevatorId
           ? {
               ...e,
@@ -79,8 +54,15 @@ export const ElevatorProvider = ({ children }) => {
                 : [...e.targetFloors, floor],
             }
           : e
-      )
-    );
+      );
+      const selected = updated.find(e => e.id === elevatorId);
+      fetch(`/api/elevators/${elevatorId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(selected),
+      }).catch(err => console.error('save failed', err));
+      return updated;
+    });
   };
 
   return (
